@@ -69,8 +69,9 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
         Button saveBtn = dialog.findViewById(R.id.saveTodo);
         ImageButton closeBtn = dialog.findViewById(R.id.cancelPopup);
-        EditText todoTitle = dialog.findViewById(R.id.enterTodo);
-        saveBtn.setOnClickListener(v -> saveTodo(todoTitle, dialog));
+        EditText todoTitle = dialog.findViewById(R.id.enterTitle);
+        EditText todoText = dialog.findViewById(R.id.enterTodo);
+        saveBtn.setOnClickListener(v -> saveTodo(todoTitle, todoText, dialog));
         closeBtn.setOnClickListener(v -> dialog.dismiss());
     }
 
@@ -79,23 +80,25 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = db.rawQuery("SELECT * FROM ToDoList", null);
         while (cursor.moveToNext()) {
             int todoId = cursor.getInt(0);
-            String todo = cursor.getString(1);
-            boolean completed = cursor.getInt(2) == 1;
-            todos.add(new TodoData(todoId, todo, completed));
+            String title = cursor.getString(1);
+            String todo = cursor.getString(2);
+            boolean completed = cursor.getInt(3) == 1;
+            todos.add(new TodoData(todoId, title, todo, completed));
         }
         cursor.close();
         db.close();
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private void saveTodo(EditText todoTitle, Dialog dialog) {
-        String todo = todoTitle.getText().toString().trim();
-        if (todo.isEmpty()) {
+    private void saveTodo(EditText todoTitle, EditText todoText, Dialog dialog) {
+        String title = todoTitle.getText().toString().trim();
+        String todoBody = todoText.getText().toString().trim();
+        if (title.isEmpty()) {
             showToast("Please enter a todo");
         } else {
             todos.clear();
             SQLiteDatabase db = databaseHelper.getWritableDatabase();
-            db.execSQL("INSERT INTO ToDoList (todo) VALUES (?)", new Object[]{todo});
+            db.execSQL("INSERT INTO ToDoList (title, todo, completed) VALUES (?, ?, ?)", new Object[]{title, todoBody, false});
             db.close();
             showToast("Todo Added");
             dialog.dismiss();
@@ -129,28 +132,30 @@ public class MainActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull TodoAdapter.ViewHolder holder, int position) {
             boolean completed = todos.get(position).isCompleted();
             TodoData todo = todos.get(position);
+            String todoTitle = todo.getTitle();
             String todoText = todo.getTodo();
             if (completed) {
                 holder.todoTitle.setPaintFlags(holder.todoTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
                 holder.todoTitle.setPaintFlags(holder.todoTitle.getPaintFlags() & ~(Paint.STRIKE_THRU_TEXT_FLAG));
             }
-            holder.todoTitle.setText(todoText);
+            holder.todoText.setText(todoText);
+            holder.todoTitle.setText(todoTitle);
             int todoId = todo.getId();
             holder.deleteBtn.setOnClickListener(v -> showDeletePopup(todoId, position));
             holder.checkBox.setChecked(completed);
             holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> markAsCompleted(todoId, holder.todoTitle, isChecked));
             holder.todoBody.setOnLongClickListener(v -> {
-                showEditPopup(todoId, todoText);
+                showEditPopup(todoId, todoTitle, todoText);
                 return true;
             });
         }
 
-        private void showEditPopup(int todoId, String todoText) {
-            editTodoDialog(todoId, todoText);
+        private void showEditPopup(int todoId, String todoTitle, String todoText) {
+            editTodoDialog(todoId, todoTitle, todoText);
         }
 
-        private void editTodoDialog(int todoId, String todoText) {
+        private void editTodoDialog(int todoId, String todoTitle, String todoText) {
             Dialog dialog = new Dialog(context);
             dialog.setContentView(R.layout.popup_add_todo);
             Objects.requireNonNull(dialog.getWindow()).setElevation(10.0f);
@@ -160,20 +165,23 @@ public class MainActivity extends AppCompatActivity {
             dialog.show();
             Button saveBtn = dialog.findViewById(R.id.saveTodo);
             ImageButton closeBtn = dialog.findViewById(R.id.cancelPopup);
-            EditText todoTitle = dialog.findViewById(R.id.enterTodo);
-            todoTitle.setText(todoText);
-            saveBtn.setOnClickListener(v -> updateTodo(todoId, todoTitle, dialog));
+            EditText title = dialog.findViewById(R.id.enterTitle);
+            EditText todo = dialog.findViewById(R.id.enterTodo);
+            title.setText(todoTitle);
+            todo.setText(todoText);
+            saveBtn.setOnClickListener(v -> updateTodo(todoId, title, todo, dialog));
             closeBtn.setOnClickListener(v -> dialog.dismiss());
         }
 
         @SuppressLint("NotifyDataSetChanged")
-        private void updateTodo(int todoId, EditText todoTitle, Dialog dialog) {
-            String todo = todoTitle.getText().toString().trim();
-            if (todo.isEmpty()) {
+        private void updateTodo(int todoId, EditText todoTitle, EditText todoText, Dialog dialog) {
+            String title = todoTitle.getText().toString().trim();
+            String todoBody = todoText.getText().toString().trim();
+            if (title.isEmpty()) {
                 showToast("Todo cannot be empty");
             } else {
                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
-                db.execSQL("UPDATE ToDoList SET todo = ? WHERE id = ?", new Object[]{todo, todoId});
+                db.execSQL("UPDATE ToDoList SET title = ?, todo = ? WHERE id = ?", new Object[]{title, todoBody, todoId});
                 db.close();
                 showToast("Todo Updated");
                 dialog.dismiss();
@@ -232,14 +240,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
-            TextView todoTitle;
+            TextView todoTitle, todoText;
             ImageButton deleteBtn;
             CheckBox checkBox;
             LinearLayout todoBody;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                todoTitle = itemView.findViewById(R.id.todoText);
+                todoTitle = itemView.findViewById(R.id.todoTitle);
+                todoText = itemView.findViewById(R.id.todoText);
                 deleteBtn = itemView.findViewById(R.id.deleteButton);
                 checkBox = itemView.findViewById(R.id.checkCompleted);
                 todoBody = itemView.findViewById(R.id.todoBody);

@@ -2,16 +2,25 @@ package com.example.mynote;
 
 public class TodoData {
     int id;
-    String todo;
+    String title, todo;
     boolean completed;
 
-    public TodoData(int id, String todo, boolean completed) {
+    public TodoData(int id, String title, String todo, boolean completed) {
         this.id = id;
+        this.title = title;
         this.todo = todo;
         this.completed = completed;
     }
 
     public TodoData() {
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public boolean isCompleted() {

@@ -19,19 +19,36 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginHorizontal="10dp"
-            android:buttonTint="@color/yellow"
-            android:button="@drawable/check_box" />
+            android:button="@drawable/check_box"
+            android:buttonTint="@color/yellow" />
 
-        <TextView
-            android:id="@+id/todoText"
+        <LinearLayout
+            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/your_todo_here"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            tools:ignore="TextContrastCheck" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/todoTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/your_todo_here"
+                android:textColor="@color/black"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:ignore="TextContrastCheck" />
+
+            <TextView
+                android:id="@+id/todoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:hint="@string/todotext" />
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/deleteButton"

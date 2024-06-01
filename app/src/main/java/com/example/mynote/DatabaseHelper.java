@@ -17,7 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         try {
-            db.execSQL("CREATE TABLE ToDoList (id INTEGER PRIMARY KEY AUTOINCREMENT, todo TEXT, completed BOOLEAN DEFAULT false)");
+            db.execSQL("CREATE TABLE ToDoList (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT, todo TEXT, completed BOOLEAN DEFAULT false)");
         } catch (SQLException e) {
             Log.e("DatabaseHelper", "Error creating database: " + e.getMessage());
         }
