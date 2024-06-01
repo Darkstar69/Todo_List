@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:paddingBottom="30dp"
+    tools:context=".MainActivity">
+
+    <Toolbar
+        android:id="@+id/toolBar"
+        android:background="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        tools:layout_editor_absoluteX="-1dp"
+        tools:layout_editor_absoluteY="-31dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/todoListRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolBar"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="1dp" />
+
+    <ImageButton
+        android:id="@+id/addTodoBtn"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/rounded_button"
+        android:backgroundTint="@color/black"
+        app:srcCompat="@drawable/baseline_add_24"
+        tools:ignore="ContentDescription" />
+
+</RelativeLayout>
