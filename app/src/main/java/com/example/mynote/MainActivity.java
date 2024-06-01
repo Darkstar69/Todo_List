@@ -136,15 +136,17 @@ public class MainActivity extends AppCompatActivity {
             String todoText = todo.getTodo();
             if (completed) {
                 holder.todoTitle.setPaintFlags(holder.todoTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                holder.todoText.setPaintFlags(holder.todoText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             } else {
                 holder.todoTitle.setPaintFlags(holder.todoTitle.getPaintFlags() & ~(Paint.STRIKE_THRU_TEXT_FLAG));
+                holder.todoText.setPaintFlags(holder.todoText.getPaintFlags() & ~(Paint.STRIKE_THRU_TEXT_FLAG));
             }
             holder.todoText.setText(todoText);
             holder.todoTitle.setText(todoTitle);
             int todoId = todo.getId();
             holder.deleteBtn.setOnClickListener(v -> showDeletePopup(todoId, position));
             holder.checkBox.setChecked(completed);
-            holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> markAsCompleted(todoId, holder.todoTitle, isChecked));
+            holder.checkBox.setOnCheckedChangeListener((v, isChecked) -> markAsCompleted(todoId, holder.todoTitle,holder.todoText, isChecked));
             holder.todoBody.setOnLongClickListener(v -> {
                 showEditPopup(todoId, todoTitle, todoText);
                 return true;
@@ -202,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
             builder.show();
         }
 
-        private void markAsCompleted(int todoId, TextView todoTitle, boolean isChecked) {
+        private void markAsCompleted(int todoId, TextView todoTitle, TextView todoText, boolean isChecked) {
             SQLiteDatabase db = databaseHelper.getWritableDatabase();
             db.execSQL("UPDATE ToDoList SET completed = ? WHERE id = ?", new Object[]{isChecked, todoId});
             db.close();
@@ -210,8 +212,10 @@ public class MainActivity extends AppCompatActivity {
                 if (todo.getId() == todoId) {
                     if (isChecked) {
                         todoTitle.setPaintFlags(todoTitle.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                        todoText.setPaintFlags(todoText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     } else {
                         todoTitle.setPaintFlags(todoTitle.getPaintFlags() & ~(Paint.STRIKE_THRU_TEXT_FLAG));
+                        todoText.setPaintFlags(todoText.getPaintFlags() & ~(Paint.STRIKE_THRU_TEXT_FLAG));
                     }
                 }
             }
